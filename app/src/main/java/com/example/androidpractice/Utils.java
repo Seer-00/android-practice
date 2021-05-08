@@ -120,11 +120,9 @@ public class Utils {
             return null;
         }
 
-        BookInfo bookInfo = null;
+        BookInfo bookInfo = new BookInfo();
 
         try {
-            bookInfo = new BookInfo();
-
             if (!("null".equals(json.getString(BookAPI.TAG_COVER)))) {
                 bookInfo.setBookCover(BitmapUtils.downloadBitmap(json.getString(BookAPI.TAG_COVER)));
             }
@@ -134,6 +132,9 @@ public class Utils {
             bookInfo.setBookPublisher(json.getString(BookAPI.TAG_PUBLISHER));
             bookInfo.setBookPublishDate(json.getString(BookAPI.TAG_PUBLISH_DATE));
             bookInfo.setBookISBN(json.getString(BookAPI.TAG_ISBN));
+            bookInfo.setBookPages(json.getString(BookAPI.TAG_PAGES));
+            bookInfo.setBookPrice(json.getString(BookAPI.TAG_PRICE));
+            bookInfo.setBookDoubanScore(json.getString(BookAPI.TAG_DOUBANSCORE));
             bookInfo.setBookAuthorIntro(json.getString(BookAPI.TAG_AUTHOR_INTRO).replace("\n", "\n\n"));
             bookInfo.setBookSummary(json.getString(BookAPI.TAG_SUMMARY).replace("\n", "\n\n"));
             Log.i(TAG, "Success: parseBookInfo");

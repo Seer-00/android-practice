@@ -20,6 +20,9 @@ public class BookInfoDetailActivity extends Activity {
     private TextView bPublisher;
     private TextView bPubDate;
     private TextView bISBN;
+    private TextView bPages;
+    private TextView bPrice;
+    private TextView bScore;
     private TextView bAuthorIntro;
     private TextView bSummary;
 
@@ -46,6 +49,9 @@ public class BookInfoDetailActivity extends Activity {
         bPublisher = findViewById(R.id.book_publisher);
         bPubDate = findViewById(R.id.book_pub_date);
         bISBN = findViewById(R.id.book_isbn);
+        bPages = findViewById(R.id.book_pages);
+        bPrice = findViewById(R.id.book_price);
+        bScore = findViewById(R.id.book_dbscore);
         bAuthorIntro = findViewById(R.id.book_author_intro);
         bSummary = findViewById(R.id.book_summary);
     }
@@ -59,6 +65,9 @@ public class BookInfoDetailActivity extends Activity {
         String str_pub = "出版社: " + checkNull(bookInfo.getBookPublisher());
         String str_pubd = "出版日期: " + checkNull(bookInfo.getBookPublishDate());
         String str_isbn = "ISBN: " + checkNull(bookInfo.getBookISBN());
+        String str_pages = "页数: " + checkNull(bookInfo.getBookPages());
+        String str_price = "价格: " + checkNull(bookInfo.getBookPrice());
+        String str_score = "豆瓣分数: " + checkNull(bookInfo.getBookDoubanScore());
         String str_intro = "\u3000\u3000" + checkNull(bookInfo.getBookAuthorIntro());
         String str_sum = "\u3000\u3000" + checkNull(bookInfo.getBookSummary());
 
@@ -75,6 +84,9 @@ public class BookInfoDetailActivity extends Activity {
         bPublisher.setText(str_pub);
         bPubDate.setText(str_pubd);
         bISBN.setText(str_isbn);
+        bPages.setText(str_pages);
+        bPrice.setText(str_price);
+        bScore.setText(str_score);
         bAuthorIntro.setText(str_intro);
         bSummary.setText(str_sum);
     }

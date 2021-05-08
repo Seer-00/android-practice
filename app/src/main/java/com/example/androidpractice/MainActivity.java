@@ -38,11 +38,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startScanner() {
+        // 原始扫描
         /*
         IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
         integrator.initiateScan();
         */
 
+        // 自定义样式扫描
         new IntentIntegrator(this)
                 .setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)// 扫码的类型，可选：一维码，二维码，一/二维码
                 //.setPrompt("请对准二维码")// 设置提示语

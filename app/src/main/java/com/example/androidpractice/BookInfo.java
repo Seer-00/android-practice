@@ -12,6 +12,9 @@ public class BookInfo implements Parcelable {
     private String bookPublisher;   // 出版社
     private String bookPublishDate; // 出版日期
     private String bookISBN;        // ISBN
+    private String bookPages;       // 页数
+    private String bookPrice;       // 价格
+    private String bookDoubanScore; // 豆瓣分数
     private String bookAuthorIntro; // 作者简介
     private String bookSummary;     // 内容简介
 
@@ -26,6 +29,9 @@ public class BookInfo implements Parcelable {
             bookInfo.bookPublisher = source.readString();
             bookInfo.bookPublishDate = source.readString();
             bookInfo.bookISBN = source.readString();
+            bookInfo.bookPages = source.readString();
+            bookInfo.bookPrice = source.readString();
+            bookInfo.bookDoubanScore = source.readString();
             bookInfo.bookAuthorIntro = source.readString();
             bookInfo.bookSummary = source.readString();
             return bookInfo;
@@ -52,6 +58,9 @@ public class BookInfo implements Parcelable {
         parcel.writeString(bookPublisher);
         parcel.writeString(bookPublishDate);
         parcel.writeString(bookISBN);
+        parcel.writeString(bookPages);
+        parcel.writeString(bookPrice);
+        parcel.writeString(bookDoubanScore);
         parcel.writeString(bookAuthorIntro);
         parcel.writeString(bookSummary);
     }
@@ -104,12 +113,28 @@ public class BookInfo implements Parcelable {
         this.bookISBN = bookISBN;
     }
 
-    public String getBookSummary() {
-        return bookSummary;
+    public String getBookPages() {
+        return bookPages;
     }
 
-    public void setBookSummary(String bookSummary) {
-        this.bookSummary = bookSummary;
+    public void setBookPages(String bookPages) {
+        this.bookPages = bookPages;
+    }
+
+    public String getBookPrice() {
+        return bookPrice;
+    }
+
+    public void setBookPrice(String bookPrice) {
+        this.bookPrice = bookPrice;
+    }
+
+    public String getBookDoubanScore() {
+        return bookDoubanScore;
+    }
+
+    public void setBookDoubanScore(String bookDoubanScore) {
+        this.bookDoubanScore = bookDoubanScore;
     }
 
     public String getBookAuthorIntro() {
@@ -118,5 +143,13 @@ public class BookInfo implements Parcelable {
 
     public void setBookAuthorIntro(String bookAuthorIntro) {
         this.bookAuthorIntro = bookAuthorIntro;
+    }
+
+    public String getBookSummary() {
+        return bookSummary;
+    }
+
+    public void setBookSummary(String bookSummary) {
+        this.bookSummary = bookSummary;
     }
 }
