@@ -1,15 +1,16 @@
 package com.example.androidpractice;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-public class BookInfoDetailActivity extends AppCompatActivity {
+public class BookInfoDetailActivity extends Activity {
 
     private static final String TAG = BookInfoDetailActivity.class.getName();
 
@@ -25,6 +26,13 @@ public class BookInfoDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //去掉标题栏和信息栏
+        /*
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        */
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_book_info_detail);
 
         initViews();
