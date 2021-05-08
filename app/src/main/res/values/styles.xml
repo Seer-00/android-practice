@@ -8,4 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="BookInfoContent">
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="BookInfoTitle">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

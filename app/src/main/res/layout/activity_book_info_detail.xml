@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BookInfoDetailActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/book_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:text="BookName"/>
+
+        <ImageView
+            android:id="@+id/book_cover"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/book_name"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
+
+        <TextView
+            android:id="@+id/book_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_below="@id/book_name"
+            android:layout_toRightOf="@id/book_cover"
+            android:text="BookAuthor"
+            style="@style/BookInfoContent"/>
+
+        <TextView
+            android:id="@+id/book_publisher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_below="@id/book_author"
+            android:layout_alignLeft="@id/book_author"
+            android:text="BookPublisher"
+            style="@style/BookInfoContent"/>
+
+        <TextView
+            android:id="@+id/book_pub_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_below="@id/book_publisher"
+            android:layout_alignLeft="@id/book_author"
+            android:text="BookPublishDate"
+            style="@style/BookInfoContent"/>
+
+        <TextView
+            android:id="@+id/book_isbn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_below="@id/book_pub_date"
+            android:layout_alignLeft="@id/book_author"
+            android:text="BookISBN"
+            style="@style/BookInfoContent"/>
+
+        <TextView
+            android:id="@+id/intro_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_below="@id/book_cover"
+            android:gravity="center"
+            android:text="作者简介"
+            style="@style/BookInfoTitle"/>
+
+        <TextView
+            android:id="@+id/book_author_intro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/intro_title"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:text="BookAuthorIntro"
+            style="@style/BookInfoContent"/>
+
+        <TextView
+            android:id="@+id/summary_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_below="@id/book_author_intro"
+            android:gravity="center"
+            android:text="内容简介"
+            style="@style/BookInfoTitle"/>
+
+        <TextView
+            android:id="@+id/book_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/summary_title"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="20dp"
+            android:text="BookSummary"
+            style="@style/BookInfoContent"/>
+
+
+    </RelativeLayout>
+
+</ScrollView>
