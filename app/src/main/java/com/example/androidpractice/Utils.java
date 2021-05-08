@@ -11,9 +11,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static com.example.androidpractice.HttpURLHelp.downloadStringFromURL;
+
 public class Utils {
 
-    private static final String TAG = "_Utils";
+    private static final String TAG = Utils.class.getName();
 
     public static Response download(String url) {
         Log.i(TAG, "Success: downloading from: " + url);
@@ -34,14 +36,14 @@ public class Utils {
             case BookAPI.RESPONSE_CODE_SUCCEED:
                 // 解析JSONObject对象
                 res.setResMessage(parseBookInfo(json));
-                // 数据无效（如书本未找到）
+                // 数据无效（如书本未找到），ResCode == 404
                 if (res.getResMessage() == null) {
-                    res.setResCode(BookAPI.RESPONSE_CODE_ERROE_BOOK_NOT_FOUND); // 404
+                    res.setResCode(BookAPI.RESPONSE_CODE_ERROE_BOOK_NOT_FOUND);
                     res.setResMessage("没有找到这本书...");
                 }
                 break;
 
-            // 连接异常（如网络错误），设置错误信息
+            // 连接异常（如网络错误或连接超时），设置错误信息，ResCode == 408
             default:
                 res.setResCode(BookAPI.RESPONSE_CODE_ERROR_TIME_OUT);
                 res.setResMessage("通信出现错误...");
@@ -52,8 +54,21 @@ public class Utils {
     }
 
     private static Response downloadFromAPI(String url) {
+        String data = downloadStringFromURL(url);
+
+        if (data.isEmpty()) {
+            // downloadStringFromURL()返回空串，说明连接失败，没有得到数据
+            return new Response(BookAPI.RESPONSE_CODE_ERROR_TIME_OUT, null);
+        } else {
+            // 否则连接成功，包含2种情况：1.找到书本 2.没有找到书本
+            return new Response(BookAPI.RESPONSE_CODE_SUCCEED, data);
+        }
+
+        /*
         // 默认状态码为超时：408
         int resCode = BookAPI.RESPONSE_CODE_ERROR_TIME_OUT;
+
+
 
         StringBuffer buffer = new StringBuffer();
         HttpURLConnection connection = null;
@@ -89,6 +104,8 @@ public class Utils {
         }
 
         return new Response(resCode, buffer.toString());
+
+         */
     }
 
     private static BookInfo parseBookInfo(JSONObject json) {
@@ -123,6 +140,7 @@ public class Utils {
         } catch (JSONException e) {
             e.printStackTrace();
             Log.i(TAG, "Failure: parseBookInfo");
+            return null;
         }
 
         return bookInfo;

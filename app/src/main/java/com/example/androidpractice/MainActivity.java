@@ -19,7 +19,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static String TAG = "MainActivity";
+    private static String TAG = MainActivity.class.getName();
     private ProgressDialog mProgressDialog;
     private DownloadHandler mDownloadHandler = new DownloadHandler(this);
 
@@ -45,17 +45,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-
         if ((result == null) || (result.getContents() == null)) {
-            Log.i(MainActivity.TAG, "用户取消了扫描.");
-            Toast.makeText(this, "取消扫描.", Toast.LENGTH_SHORT).show();
+            Log.i(MainActivity.TAG, "用户取消了扫描");
+            Toast.makeText(this, "扫描取消", Toast.LENGTH_SHORT).show();
             return;
         }
         String contents = result.getContents();
-        // String contents = "9787121402180";
-        // String contents = "9787115209306";
 
-        Log.i(MainActivity.TAG, "扫描结果: " + contents);
+        /* ISBN for debugging */
+        // String contents = "0000000000000";      // book not found
+        // String contents = "9787121402180";      // no cover
+        // String contents = "9787115209306";      // valid
+
+        Log.i(MainActivity.TAG, "Scanning result: " + contents);
         Toast.makeText(this, "扫描结果: " + contents, Toast.LENGTH_LONG).show();
 
         // 下载耗时，显示进度条
@@ -94,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
             mDownloadHandler.sendMessage(msg);
         }
     }
-
 
     private static class DownloadHandler extends Handler {
 

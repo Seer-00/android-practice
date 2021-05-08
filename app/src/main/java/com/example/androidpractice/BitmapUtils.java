@@ -57,8 +57,8 @@ public class BitmapUtils {
             sampleSize = 1;
         }
 
-        Log.i(TAG, "compress sampleSize: " + sampleSize);
-        Log.i(TAG, "Compressed W/H: " + w/sampleSize + " " + h/sampleSize);
+        Log.i(TAG, "compress sampleSize: " + sampleSize + " Compressed W/H: "
+                + w/sampleSize + " " + h/sampleSize);
 
         // 设置缩放比例
         newOpts.inSampleSize = sampleSize;
@@ -71,15 +71,25 @@ public class BitmapUtils {
     }
 
     public static Bitmap downloadBitmap(String url) {
-        HttpURLConnection connection = null;
+        HttpURLConnection conn;
         InputStream is = null;
         BufferedInputStream bis = null;
         Bitmap bitmap = null;
 
         try {
-            connection = (HttpURLConnection) (new URL(url)).openConnection();
-            connection.setConnectTimeout(5000);
-            is = connection.getInputStream();
+            URL realUrl = new URL(url);
+            // 通过请求地址判断请求类型(http或者是https)
+            if (realUrl.getProtocol().toLowerCase().equals("https")) {
+                Log.i(TAG, "Download bitmap via https...");
+                conn = HttpURLHelp.getHttpsConnection(url);
+            } else {
+                Log.i(TAG, "Download bitmap via http...");
+                conn = (HttpURLConnection) realUrl.openConnection();
+            }
+
+            Log.i(TAG, "Download bitmap from " + url);
+
+            is = conn.getInputStream();
             bis = new BufferedInputStream(is);
             bitmap = BitmapFactory.decodeStream(bis);
 
@@ -87,6 +97,7 @@ public class BitmapUtils {
                     + bitmap.getHeight() + "/" + bitmap.getWidth() + "/" + bitmap.getAllocationByteCount());
 
             bitmap = compress(bitmap);
+
             Log.i(TAG, "Success: compress bitmap H/W/Size" + " "
                     + bitmap.getHeight() + "/" + bitmap.getWidth() + "/" + bitmap.getAllocationByteCount());
 
