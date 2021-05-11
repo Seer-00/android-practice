@@ -1,21 +1,15 @@
-package com.example.androidpractice;
+package com.example.androidpractice.ISBN;
 
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import static com.example.androidpractice.ISBN.HttpURLHelp.downloadStringFromURL;
 
-import static com.example.androidpractice.HttpURLHelp.downloadStringFromURL;
+public class DownloadUtils {
 
-public class Utils {
-
-    private static final String TAG = Utils.class.getName();
+    private static final String TAG = DownloadUtils.class.getName();
 
     public static Response download(String url) {
         Log.i(TAG, "Success: downloading from: " + url);
@@ -137,6 +131,12 @@ public class Utils {
             bookInfo.setBookDoubanScore(json.getString(BookAPI.TAG_DOUBANSCORE));
             bookInfo.setBookAuthorIntro(json.getString(BookAPI.TAG_AUTHOR_INTRO).replace("\n", "\n\n"));
             bookInfo.setBookSummary(json.getString(BookAPI.TAG_SUMMARY).replace("\n", "\n\n"));
+
+            // 豆瓣分数为0，表示无数据，应置于null
+            if (bookInfo.getBookDoubanScore().equals("0")) {
+                bookInfo.setBookDoubanScore("null");
+            }
+
             Log.i(TAG, "Success: parseBookInfo");
         } catch (JSONException e) {
             e.printStackTrace();

@@ -1,4 +1,4 @@
-package com.example.androidpractice;
+package com.example.androidpractice.ISBN;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -6,9 +6,10 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.androidpractice.R;
 
 public class BookInfoDetailActivity extends Activity {
 

@@ -10,7 +10,7 @@
         app:zxing_framing_rect_width="300dp" />
 
 
-    <com.example.androidpractice.CustomZxingView
+    <com.example.androidpractice.ISBN.CustomZxingView
         android:id="@+id/zxing_viewfinder_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

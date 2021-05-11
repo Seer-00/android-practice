@@ -3,6 +3,10 @@
     package="com.example.androidpractice">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 
     <application
         android:allowBackup="true"
@@ -11,13 +15,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".ScanISBNActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-        </activity>
+        <!--
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+         -->
         <activity
-            android:name=".MainActivity">
+            android:name=".ISBN.ScanISBNActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
+
+        <activity android:name=".ISBN.toScanActivity"></activity>
+
+        <activity android:name=".ISBN.BookInfoDetailActivity"></activity>
+
+        <activity android:name=".RegLogActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,11 +41,9 @@
         </activity>
 
         <activity
-            android:name=".BookInfoDetailActivity">
-        </activity>
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"></activity>
 
     </application>
 
 </manifest>
-
-<!-- android:screenOrientation="portrait" -->

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegLogActivity"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/edit_usr"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Username"/>
+
+    <EditText
+        android:id="@+id/edit_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Password"/>
+
+    <EditText
+        android:id="@+id/edit_ip"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Server IP Address"/>
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Login"/>
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Register"/>
+
+</LinearLayout>
