@@ -20,6 +20,18 @@
         app:layout_constraintTop_toTopOf="parent" />
     -->
 
+    <EditText
+        android:id="@+id/edit_content"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Content"/>
+
+    <Button
+        android:id="@+id/btn_send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send"/>
+
     <Button
         android:id="@+id/btn_to_scan"
         android:layout_width="match_parent"

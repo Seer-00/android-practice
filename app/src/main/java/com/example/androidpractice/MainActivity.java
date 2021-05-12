@@ -4,7 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,16 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.jivesoftware.smack.chat2.Chat;
+import org.jivesoftware.smack.chat2.ChatManager;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterEntry;
+import org.jxmpp.jid.EntityBareJid;
+
+import java.util.Collection;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getName();
@@ -26,10 +37,16 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
     private static ConnHandler connHandler;
+    private static RecvHandler recvHandler;
     private static XConnectionHelp conn;
+    private static ChatManager chatManager = null;
 
     public XConnectionHelp getConn() {
         return conn;
+    }
+
+    public ChatManager getChatManager() {
+        return chatManager;
     }
 
     @Override
@@ -45,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
+//        setMainActivity(this);
 
         initConnection();
     }
@@ -63,14 +82,16 @@ public class MainActivity extends AppCompatActivity {
 
         conn = new XConnectionHelp();
         connHandler = new ConnHandler(this);
+        recvHandler = new RecvHandler(this);
 
         showProgressDialog();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
+                // String res = conn.login2Server(usr, pwd, ip);
                 String res = conn.login2Server("test3", "123", "192.168.81.135");
-                Message msg = Message.obtain();
+                android.os.Message msg = android.os.Message.obtain();
                 msg.obj = res;
                 connHandler.sendMessage(msg);
             }
@@ -85,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
+        public void handleMessage(@NonNull android.os.Message msg) {
             if (msg.obj == null || mainActivity.progressDialog == null
                     || !(mainActivity.progressDialog.isShowing())) {
                 return;
@@ -96,7 +117,31 @@ public class MainActivity extends AppCompatActivity {
 
             if (!(res.equals(XConnectionHelp.RET_SUCC))) {
                 Toast.makeText(mainActivity, "连接服务器出错...", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            initRoster();
+            initChatManager();
+        }
+    }
+
+    private static class RecvHandler extends Handler {
+        private MainActivity mainActivity;
+
+        public RecvHandler(MainActivity mainActivity) {
+            this.mainActivity = mainActivity;
+        }
+
+        @Override
+        public void handleMessage(@NonNull android.os.Message msg) {
+            if (msg.obj == null) {
+                return;
+            }
+
+            String recvMsg = (String) msg.obj;
+
+            Log.i(TAG, recvMsg);
+            Toast.makeText(mainActivity, recvMsg, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -106,4 +151,31 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
+    private static void initChatManager() {
+        // init chatManager
+        chatManager = ChatManager.getInstanceFor(conn.getConnection());
+        chatManager.addIncomingListener(new IncomingChatMessageListener() {
+            @Override
+            public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+                String recvMsg = "New message from " + from + ": " + message.getBody();
+                android.os.Message msg = android.os.Message.obtain();
+                msg.obj = recvMsg;
+                recvHandler.sendMessage(msg);
+            }
+        });
+        Log.i(TAG, "init charManager");
+    }
+
+    private static void initRoster() {
+        Roster roster = Roster.getInstanceFor(conn.getConnection());
+        Collection<RosterEntry> entries = roster.getEntries();
+        for (RosterEntry entry : entries) {
+            Log.i(TAG, "JID: " + entry.getJid() + " Group: " + entry.getGroups()
+            + " Type: " + entry.getType() + " Name: " + entry.getName());
+        }
+        // JID: test1@ubuntu
+        // Group: [org.jivesoftware.smack.roster.RosterGroup@2d68d6d3]
+        // Type: both
+        // Name: test1
+    }
 }

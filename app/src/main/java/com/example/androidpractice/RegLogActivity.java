@@ -106,10 +106,12 @@ public class RegLogActivity extends AppCompatActivity {
             String ret = null;
             switch (type) {
                 case TYPE_LOG: {
+                    // ret = conn.login2Server(usr, pwd, ip);
                     ret = conn.login2Server("test3", "123", "192.168.81.135");
                     break;
                 }
                 case TYPE_REG: {
+                    // ret = conn.register2Server(usr, pwd, ip);
                     ret = conn.register2Server("test111", "123", "192.168.81.135");
                     break;
                 }

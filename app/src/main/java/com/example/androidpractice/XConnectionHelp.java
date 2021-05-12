@@ -84,7 +84,7 @@ public class XConnectionHelp implements Serializable {
             accountManager.createAccount(Localpart.from(usr), pwd);
             Log.i(TAG, "register2Server: Successful registration");
 
-            // admin/admin disconnect
+            // account: admin/admin disconnect
             connection.disconnect();
 
         } catch (XMPPException.XMPPErrorException e) {
