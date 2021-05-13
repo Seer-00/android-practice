@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,6 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jivesoftware.smack.chat2.Chat;
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-//        setMainActivity(this);
+        Fresco.initialize(this);
 
         initConnection();
     }
@@ -89,8 +89,10 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                /*-- DEBUG --*/
                 // String res = conn.login2Server(usr, pwd, ip);
-                String res = conn.login2Server("test3", "123", "192.168.81.135");
+//                String res = conn.login2Server("test3", "123", "192.168.81.135");
+                String res = XConnectionHelp.RET_SUCC;
                 android.os.Message msg = android.os.Message.obtain();
                 msg.obj = res;
                 connHandler.sendMessage(msg);
@@ -120,8 +122,9 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            initRoster();
-            initChatManager();
+            /*-- DEBUG --*/
+//            initRoster();
+//            initChatManager();
         }
     }
 

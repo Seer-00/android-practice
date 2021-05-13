@@ -52,7 +52,7 @@ public class RegLogActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        conn.getConnection().disconnect();
+//        conn.getConnection().disconnect();
         super.onDestroy();
     }
 
@@ -106,11 +106,14 @@ public class RegLogActivity extends AppCompatActivity {
             String ret = null;
             switch (type) {
                 case TYPE_LOG: {
+                    /*-- DEBUG --*/
                     // ret = conn.login2Server(usr, pwd, ip);
-                    ret = conn.login2Server("test3", "123", "192.168.81.135");
+//                    ret = conn.login2Server("test3", "123", "192.168.81.135");
+                    ret = XConnectionHelp.RET_SUCC;
                     break;
                 }
                 case TYPE_REG: {
+                    /*-- DEBUG --*/
                     // ret = conn.register2Server(usr, pwd, ip);
                     ret = conn.register2Server("test111", "123", "192.168.81.135");
                     break;

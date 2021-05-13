@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,10 +15,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.androidpractice.Contacts.Contact;
+import com.example.androidpractice.Contacts.ContactAdapter;
 import com.example.androidpractice.MainActivity;
 import com.example.androidpractice.R;
 import com.example.androidpractice.XConnectionHelp;
+import com.facebook.drawee.backends.pipeline.Fresco;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat2.Chat;
@@ -25,6 +32,10 @@ import org.jivesoftware.smack.chat2.ChatManager;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -37,6 +48,8 @@ public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
 
+    private List<Contact> contactList = new ArrayList<>();
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -45,32 +58,24 @@ public class HomeFragment extends Fragment {
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // final TextView textView = root.findViewById(R.id.text_home);
+        // init contact list
+        initList();
 
-        // get conn and chatManager from MainActivity
-
-
-        /*homeViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                // textView.setText(s);
-                Log.i(TAG, "onChanged");
-            }
-        });*/
-
-
-        /*if (chatManager == null) {
-            // Assume we've created an XMPPConnection name "connection".
-            chatManager = ChatManager.getInstanceFor(conn.getConnection());
-            chatManager.addIncomingListener(new IncomingChatMessageListener() {
-                @Override
-                public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                    Log.i(TAG, "New message from " + from + ": " + message.getBody());
-                }
-
-            });
-        }*/
+        RecyclerView recyclerView = root.findViewById(R.id.home_recycler_view);
+        LinearLayoutManager manager = new LinearLayoutManager(this.getActivity());
+        recyclerView.setLayoutManager(manager);
+        ContactAdapter adapter = new ContactAdapter(contactList, this.getActivity());
+        recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(
+                this.getActivity(), DividerItemDecoration.VERTICAL));
 
         return root;
+    }
+
+    private void initList() {
+        for (int i = 0; i < 20; i++) {
+            Contact contact = new Contact(String.valueOf(i));
+            contactList.add(contact);
+        }
     }
 }
