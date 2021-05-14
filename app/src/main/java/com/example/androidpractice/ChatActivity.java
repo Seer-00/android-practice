@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.androidpractice.contacts.Contact;
 import com.example.androidpractice.msg.Msg;
 import com.example.androidpractice.msg.MsgAdapter;
 
@@ -69,7 +70,7 @@ public class ChatActivity extends Activity {
         Intent intent = getIntent();
         self = intent.getParcelableExtra("Self");
         peerJID = intent.getStringExtra("PeerJID");
-        peer = getPeerName(peerJID);
+        peer = Contact.getNameFromJID(peerJID);
 
         conn = new XConnectionHelp();
         connHandler = new ConnHandler(this);
@@ -94,11 +95,11 @@ public class ChatActivity extends Activity {
         recyclerView = findViewById(R.id.chat_recycler_view);
 
         TextView tv_title = findViewById(R.id.chat_title);
-        tv_title.setText(peerJID);
+        tv_title.setText(peer);
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(manager);
-        adapter = new MsgAdapter(msgList);
+        adapter = new MsgAdapter(msgList, this, peer, self.getName());
         recyclerView.setAdapter(adapter);
 
         btn_send.setOnClickListener(new View.OnClickListener() {
@@ -178,7 +179,7 @@ public class ChatActivity extends Activity {
 
             Message recvMsg = (Message) msg.obj;
 
-            String from = chatActivity.getPeerName(recvMsg.getFrom().toString());
+            String from = Contact.getNameFromJID(recvMsg.getFrom().toString());
 
             if (peer.equals(from)) { // 当前对话的人发来的消息
                 chatActivity.msgList.add(new Msg(Msg.TYPE_RECV, recvMsg.getBody()));
@@ -201,10 +202,6 @@ public class ChatActivity extends Activity {
                 recvHandler.sendMessage(msg);
             }
         });
-        Log.i(TAG, "init charManager");
-    }
-
-    public static String getPeerName(String peerStr) {
-        return peerStr == null ? null : peerStr.substring(0, peerStr.indexOf('@'));
+        Log.i(TAG, "init chatManager");
     }
 }

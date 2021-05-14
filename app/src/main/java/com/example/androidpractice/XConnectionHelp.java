@@ -15,13 +15,15 @@ import org.jxmpp.jid.parts.Localpart;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XConnectionHelp implements Serializable {
 
     private static final String TAG = XConnectionHelp.class.getName();
 
     private static final int PORT = 5222;
-//    public static final String DOMAIN = "ubuntu";
+    //    public static final String DOMAIN = "ubuntu";
 //    public static final String IP = "192.168.43.136";
     public static final String IP = "172.21.42.126";
     public static final String RET_SUCC = "操作成功";
@@ -50,12 +52,7 @@ public class XConnectionHelp implements Serializable {
                     .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
                     //设置可以更改用户当前状态（在线、离线等等）
                     .setSendPresence(true);
-            //设置在线
-            //Presence presence = new Presence(Presence.Type.available);
-            //通知在线
-            //xmpptcpConnection.sendStanza(presence);
-            //通过配置建立连接
-            // AbstractXMPPConnection connection = new XMPPTCPConnection(configBuilder.build());
+
             connection = new XMPPTCPConnection(configBuilder.build());
             // 连接到服务器
             connection.connect();
@@ -82,9 +79,12 @@ public class XConnectionHelp implements Serializable {
                 Log.i(TAG, "register2Server: Successful connection");
             }
 
+            Map<String, String> attributes = new HashMap<>();
+            attributes.put("name", u.getName());
+
             AccountManager accountManager = AccountManager.getInstance(connection);
             accountManager.sensitiveOperationOverInsecureConnection(true);
-            accountManager.createAccount(Localpart.from(u.getName()), u.getPwd());
+            accountManager.createAccount(Localpart.from(u.getName()), u.getPwd(), attributes);
             Log.i(TAG, "register2Server: Successful registration");
 
             // account: admin/admin disconnect
@@ -122,7 +122,7 @@ public class XConnectionHelp implements Serializable {
         } catch (XMPPException | IllegalArgumentException e) {
             e.printStackTrace();
             return e.toString();
-        }catch (SmackException | IOException | InterruptedException e) {
+        } catch (SmackException | IOException | InterruptedException e) {
             e.printStackTrace();
             return RET_FAIL;
         }

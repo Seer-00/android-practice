@@ -68,7 +68,7 @@ public class ContactFragment extends Fragment {
             Log.i(TAG, "JID: " + entry.getJid() + " Group: " + entry.getGroups()
                     + " Type: " + entry.getType() + " Name: " + entry.getName());
 
-            contactList.add(new Contact(entry.getName(), entry.getJid().toString()));
+            contactList.add(new Contact(entry.getJid().toString()));
         }
     }
 

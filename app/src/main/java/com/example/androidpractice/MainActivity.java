@@ -15,6 +15,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.androidpractice.contacts.Contact;
 import com.example.androidpractice.isbn.BookAPI;
 import com.example.androidpractice.isbn.BookInfo;
 import com.example.androidpractice.isbn.BookInfoDetailActivity;
@@ -31,11 +32,16 @@ import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterListener;
 import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.Jid;
 
 import java.util.Collection;
+
+import static org.jivesoftware.smack.roster.Roster.SubscriptionMode.accept_all;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -137,9 +143,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Message recvMsg = (Message) msg.obj;
-            String from = ChatActivity.getPeerName(recvMsg.getFrom().toString());
+            String from = Contact.getNameFromJID(recvMsg.getFrom().toString());
 
-            Toast.makeText(mainActivity,  "[新消息] " + from + ": " + recvMsg.getBody(),
+            Toast.makeText(mainActivity, "[新消息] " + from + ": " + recvMsg.getBody(),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -197,11 +203,39 @@ public class MainActivity extends AppCompatActivity {
 
     private void initRoster() {
         roster = Roster.getInstanceFor(conn.getConnection());
+        // 自动接收所有好友请求
+        roster.setSubscriptionMode(accept_all);
+
+        roster.addRosterListener(new RosterListener() {
+            public void entriesAdded(Collection<Jid> addresses) {
+                Log.i(TAG, "Add");
+                for(Jid jid : addresses) {
+                    Log.i(TAG, jid.toString());
+                }
+            }
+            public void entriesDeleted(Collection<Jid> addresses) {
+                Log.i(TAG, "Del");
+                for(Jid jid : addresses) {
+                    Log.i(TAG, jid.toString());
+                }
+            }
+            public void entriesUpdated(Collection<Jid> addresses) {
+                Log.i(TAG, "Updated");
+                for(Jid jid : addresses) {
+                    Log.i(TAG, jid.toString());
+                }
+            }
+            public void presenceChanged(Presence presence) {
+                Log.i(TAG, "Presence changed: " + presence.getFrom() + " " + presence);
+            }
+        });
+
         Collection<RosterEntry> entries = roster.getEntries();
         for (RosterEntry entry : entries) {
             Log.i(TAG, "JID: " + entry.getJid() + " Group: " + entry.getGroups()
                     + " Type: " + entry.getType() + " Name: " + entry.getName());
         }
+        // e.g.
         // JID: test1@ubuntu
         // Group: [org.jivesoftware.smack.roster.RosterGroup@2d68d6d3]
         // Type: both
@@ -235,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         switch (requestCode) {
-            case IntentIntegrator.REQUEST_CODE:{
+            case IntentIntegrator.REQUEST_CODE: {
                 IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                 if ((result == null) || (result.getContents() == null)) {
                     Toast.makeText(this, "扫描取消", Toast.LENGTH_SHORT).show();
@@ -252,7 +286,8 @@ public class MainActivity extends AppCompatActivity {
                 startDownloadBookInfo(contents);
                 break;
             }
-            default: break;
+            default:
+                break;
         }
     }
 

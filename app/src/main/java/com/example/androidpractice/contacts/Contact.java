@@ -7,8 +7,8 @@ public class Contact {
     private String JID;
     private int pictureIdx;
 
-    public Contact(String name, String JID) {
-        this.name = name;
+    public Contact(String JID) {
+        this.name = getNameFromJID(JID);
         this.JID = JID;
         this.pictureIdx = Math.abs(name.hashCode() % PIC_NUMBER);   // %运算可能出现负数
     }
@@ -28,4 +28,9 @@ public class Contact {
     public static int getPicNumber() {
         return PIC_NUMBER;
     }
+
+    public static String getNameFromJID(String JID) {
+        return JID == null ? null : JID.substring(0, JID.indexOf('@'));
+    }
+
 }
