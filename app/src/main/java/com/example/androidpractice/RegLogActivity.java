@@ -1,37 +1,43 @@
 package com.example.androidpractice;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import org.jivesoftware.smack.android.AndroidSmackInitializer;
 
 
-public class RegLogActivity extends AppCompatActivity {
+public class RegLogActivity extends Activity {
 
     private static final String TAG = RegLogActivity.class.getName();
     private static final int TYPE_LOG = 0;
     private static final int TYPE_REG = 1;
 
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     private EditText edtUsr;
     private EditText edtPwd;
+    private EditText edtDom;
     private EditText edtIP;
+    private CheckBox checkBox;
     private Button btnLogin;
     private Button btnRegister;
 
-    private String usr;
-    private String pwd;
-    private String ip;
+    private static User user;
 
     private ProgressDialog progressDialog;
     private static XConnectionHelp conn;
@@ -50,27 +56,29 @@ public class RegLogActivity extends AppCompatActivity {
         connHandler = new ConnHandler(this);
     }
 
-    @Override
-    protected void onDestroy() {
-//        conn.getConnection().disconnect();
-        super.onDestroy();
-    }
-
     private void initViews() {
         edtUsr = findViewById(R.id.edit_usr);
         edtPwd = findViewById(R.id.edit_pwd);
+        edtDom = findViewById(R.id.edit_domain);
         edtIP = findViewById(R.id.edit_ip);
+        checkBox = findViewById(R.id.ckb_remember);
         btnLogin = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
+
+        loadInfo();
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] inputs = getInput();
+                user = getInput();
+
+                if (user == null) {
+                    return;
+                }
 
                 showProgressDialog();
 
-                ConnThread thread = new ConnThread(inputs, TYPE_LOG);
+                ConnThread thread = new ConnThread(TYPE_LOG);
                 thread.start();
             }
         });
@@ -78,26 +86,24 @@ public class RegLogActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] inputs = getInput();
+                user = getInput();
+
+                if (user == null) {
+                    return;
+                }
 
                 showProgressDialog();
 
-                ConnThread thread = new ConnThread(inputs, TYPE_REG);
+                ConnThread thread = new ConnThread(TYPE_REG);
                 thread.start();
             }
         });
     }
 
     private static class ConnThread extends Thread {
-        private String usr;
-        private String pwd;
-        private String ip;
         private int type;
 
-        public ConnThread(String[] inputs, int type) {
-            this.usr = inputs[0];
-            this.pwd = inputs[1];
-            this.ip = inputs[2];
+        public ConnThread(int type) {
             this.type = type;
         }
 
@@ -107,15 +113,14 @@ public class RegLogActivity extends AppCompatActivity {
             switch (type) {
                 case TYPE_LOG: {
                     /*-- DEBUG --*/
-                    // ret = conn.login2Server(usr, pwd, ip);
-//                    ret = conn.login2Server("test3", "123", "192.168.81.135");
-                    ret = XConnectionHelp.RET_SUCC;
+//                    ret = XConnectionHelp.RET_SUCC;
+                    ret = conn.login2Server(user);
                     break;
                 }
                 case TYPE_REG: {
                     /*-- DEBUG --*/
-                    // ret = conn.register2Server(usr, pwd, ip);
-                    ret = conn.register2Server("test111", "123", "192.168.81.135");
+//                    ret = XConnectionHelp.RET_SUCC;
+                    ret = conn.register2Server(user);
                     break;
                 }
                 default:
@@ -153,8 +158,11 @@ public class RegLogActivity extends AppCompatActivity {
                     Toast.makeText(regLogActivity, res, Toast.LENGTH_SHORT).show();
 
                     if (res.equals(XConnectionHelp.RET_SUCC)) {
+                        conn.getConnection().disconnect();
+                        regLogActivity.storeInfo();
                         regLogActivity.startMainActivity();
                         regLogActivity.finish();
+
                     }
                     break;
                 }
@@ -174,24 +182,52 @@ public class RegLogActivity extends AppCompatActivity {
         }
     }
 
+    private User getInput() {
+        String usr = edtUsr.getText().toString().trim();
+        String pwd = edtPwd.getText().toString().trim();
+        String dom = edtDom.getText().toString().trim();
+        String ip = edtIP.getText().toString().trim();
+        if (usr.contains("@")) {
+            return null;
+        }
+        return new User(usr, pwd, dom, ip);
+    }
+
     private void showProgressDialog() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("通信中...");
         progressDialog.show();
     }
 
-    private String[] getInput() {
-        this.usr = edtUsr.getText().toString().trim();
-        this.pwd = edtPwd.getText().toString().trim();
-        this.ip = edtIP.getText().toString().trim();
-        return new String[] { this.usr, this.pwd, this.ip};
-    }
-
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("Usr", this.usr);
-        intent.putExtra("Pwd", this.pwd);
-        intent.putExtra("IP", this.ip);
+        intent.putExtra("User", user);
         startActivity(intent);
+    }
+
+    private void loadInfo() {
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean remember = pref.getBoolean("remember_info", false);
+        if (remember) {
+            edtUsr.setText(pref.getString("username", ""));
+            edtPwd.setText(pref.getString("password", ""));
+            edtDom.setText(pref.getString("domain", ""));
+            edtIP.setText(pref.getString("ip_address", ""));
+            checkBox.setChecked(true);
+        }
+    }
+
+    private void storeInfo() {
+        editor = pref.edit();
+        if (checkBox.isChecked()) {
+            editor.putBoolean("remember_info", true);
+            editor.putString("username", user.getName());
+            editor.putString("password", user.getPwd());
+            editor.putString("domain", user.getDom());
+            editor.putString("ip_address", user.getIp());
+        } else {
+            editor.clear();
+        }
+        editor.apply();
     }
 }

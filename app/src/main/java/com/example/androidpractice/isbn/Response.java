@@ -1,4 +1,4 @@
-package com.example.androidpractice.ISBN;
+package com.example.androidpractice.isbn;
 
 public class Response {
 

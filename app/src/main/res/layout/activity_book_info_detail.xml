@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ISBN.BookInfoDetailActivity">
+    tools:mainActivity=".isbn.BookInfoDetailActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

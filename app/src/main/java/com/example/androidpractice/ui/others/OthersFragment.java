@@ -1,105 +1,143 @@
 package com.example.androidpractice.ui.others;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
-import com.example.androidpractice.ISBN.toScanActivity;
+import com.example.androidpractice.User;
+import com.example.androidpractice.contacts.Contact;
+import com.example.androidpractice.contacts.ContactAdapter;
+import com.example.androidpractice.isbn.BookAPI;
+import com.example.androidpractice.isbn.BookInfo;
+import com.example.androidpractice.isbn.BookInfoDetailActivity;
+import com.example.androidpractice.isbn.DownloadUtils;
+import com.example.androidpractice.isbn.Response;
+import com.example.androidpractice.isbn.ScanISBNActivity;
 import com.example.androidpractice.MainActivity;
 import com.example.androidpractice.R;
 import com.example.androidpractice.XConnectionHelp;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
-import org.jxmpp.jid.EntityBareJid;
-import org.jxmpp.jid.impl.JidCreate;
-import org.jxmpp.stringprep.XmppStringprepException;
+import org.jivesoftware.smack.roster.Roster;
 
 
 public class OthersFragment extends Fragment {
 
     private static final String TAG = OthersFragment.class.getName();
 
-    private OthersViewModel othersViewModel;
-
-    private Button btn_scan;
-
-    private Button btnSend;
-    private EditText edtContent;
     private static XConnectionHelp conn;
     private static ChatManager chatManager;
+    private static Roster roster;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        othersViewModel =
-                ViewModelProviders.of(this).get(OthersViewModel.class);
+
+        getConnObjFromActivity();
+
         View root = inflater.inflate(R.layout.fragment_others, container, false);
-        /*
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        othersViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        */
-        btn_scan = root.findViewById(R.id.btn_to_scan);
-        btn_scan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), toScanActivity.class);
-                startActivity(intent);
-            }
-        });
 
-        btnSend = root.findViewById(R.id.btn_send);
-        edtContent = root.findViewById(R.id.edit_content);
-
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(TAG, "Send clicked");
-
-                getConnAndChatManager();
-
-                String content = edtContent.getText().toString();
-
-                try {
-                    EntityBareJid jid = JidCreate.entityBareFrom("test1@ubuntu");
-                    Chat chat = chatManager.chatWith(jid);
-                    chat.send("Howdy!");
-
-                } catch (XmppStringprepException | SmackException.NotConnectedException | InterruptedException e) {
-                    e.printStackTrace();
-                    Log.i(TAG, e.getMessage());
-                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        initViews(root);
 
         return root;
     }
 
-    private void getConnAndChatManager() {
+    private void getConnObjFromActivity() {
         if (conn == null) {
             conn = ((MainActivity) getActivity()).getConn();
         }
         if (chatManager == null) {
             chatManager = ((MainActivity) getActivity()).getChatManager();
         }
+        if (roster == null) {
+            roster = ((MainActivity) getActivity()).getRoster();
+        }
+    }
+
+    private void initViews(View view) {
+        final MainActivity mainActivity = (MainActivity) getActivity();
+        User user = mainActivity.getUser();
+
+        final EditText edt_isbn = view.findViewById(R.id.edit_isbn);
+        Button btn_search = view.findViewById(R.id.btn_search_book);
+        ImageButton btn_scan = view.findViewById(R.id.btn_to_scan);
+        SimpleDraweeView userImage = view.findViewById(R.id.img_user);
+        TextView userName = view.findViewById(R.id.tv_user);
+
+        /* set image and name of user */
+        String imageUri = "res://" + mainActivity.getPackageName() + "/"
+                + ContactAdapter.getResID().get(getPicIdx(user.getName()));
+        userImage.setImageURI(imageUri);
+        userName.setText(user.getName());
+
+        btn_scan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.startScanner();
+            }
+        });
+
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String isbn = edt_isbn.getText().toString().trim();
+                mainActivity.startDownloadBookInfo(isbn);
+                edt_isbn.setText("");
+            }
+        });
+    }
+
+    private int getPicIdx(String name) {
+        return Math.abs(name.hashCode() % Contact.getPicNumber());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        /*IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if ((result == null) || (result.getContents() == null)) {
+            Log.i(TAG, "Cancel scanning");
+            Toast.makeText(mainActivity, "扫描取消", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        *//* ISBN for debugging *//*
+        // String contents = "0000000000000";      // book not found
+        // String contents = "9787121402180";      // no cover
+        // String contents = "9787115209306";      // valid
+
+        String contents = result.getContents();
+
+        Log.i(TAG, "Scanning result: " + contents);
+        Toast.makeText(mainActivity, "扫描结果: " + contents, Toast.LENGTH_LONG).show();
+
+        // 下载耗时，显示进度条
+        mainActivity.progressDialog = new ProgressDialog(this.getActivity());
+        mainActivity.progressDialog.setMessage("通信中...");
+        mainActivity.progressDialog.show();
+
+        DownloadThread thread = new DownloadThread(BookAPI.URL_ISBN_BASE + contents);
+        thread.start();*/
     }
 }
+
+
+/*
+*   在 fragment 中启动扫描，但在 MainActivity 中相应回调
+* */

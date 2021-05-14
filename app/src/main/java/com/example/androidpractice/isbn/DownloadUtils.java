@@ -1,11 +1,11 @@
-package com.example.androidpractice.ISBN;
+package com.example.androidpractice.isbn;
 
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.example.androidpractice.ISBN.HttpURLHelp.downloadStringFromURL;
+import static com.example.androidpractice.isbn.HttpURLHelp.downloadStringFromURL;
 
 public class DownloadUtils {
 

@@ -21,8 +21,11 @@ public class XConnectionHelp implements Serializable {
     private static final String TAG = XConnectionHelp.class.getName();
 
     private static final int PORT = 5222;
-    public static final String RET_SUCC = "Success";
-    public static final String RET_FAIL = "Failure";
+//    public static final String DOMAIN = "ubuntu";
+//    public static final String IP = "192.168.43.136";
+    public static final String IP = "172.21.42.126";
+    public static final String RET_SUCC = "操作成功";
+    public static final String RET_FAIL = "操作失败";
 
     private AbstractXMPPConnection connection;
 
@@ -30,16 +33,16 @@ public class XConnectionHelp implements Serializable {
         return connection;
     }
 
-    private String connect2Server(String usr, String pwd, String ip) {
+    private String connect2Server(User u) {
         try {
             // 建立连接配置
             XMPPTCPConnectionConfiguration.Builder configBuilder = XMPPTCPConnectionConfiguration.builder();
             //设置用户名密码
-            configBuilder.setUsernameAndPassword(usr, pwd)
+            configBuilder.setUsernameAndPassword(u.getName(), u.getPwd())
                     //设置XMPP域名，也就是XMPP协议后的@后的东西
-                    .setXmppDomain("ubuntu")
+                    .setXmppDomain(u.getDom())
                     //设置主机位置，也就是服务器ip
-                    .setHostAddress(InetAddress.getByName(ip))
+                    .setHostAddress(InetAddress.getByName(u.getIp()))
                     //等同于上面那句话builder.setHost("xxx.xxx.xxx.xxx");
                     //设置端口号，默认5222
                     .setPort(PORT)
@@ -70,9 +73,9 @@ public class XConnectionHelp implements Serializable {
         return RET_SUCC;
     }
 
-    public String register2Server(String usr, String pwd, String ip) {
+    public String register2Server(User u) {
         try {
-            String ret = connect2Server("admin", "admin", ip);
+            String ret = connect2Server(new User("admin", "admin", u.getDom(), u.getIp()));
             if (!(RET_SUCC.equals(ret))) {
                 return ret;
             } else {
@@ -81,7 +84,7 @@ public class XConnectionHelp implements Serializable {
 
             AccountManager accountManager = AccountManager.getInstance(connection);
             accountManager.sensitiveOperationOverInsecureConnection(true);
-            accountManager.createAccount(Localpart.from(usr), pwd);
+            accountManager.createAccount(Localpart.from(u.getName()), u.getPwd());
             Log.i(TAG, "register2Server: Successful registration");
 
             // account: admin/admin disconnect
@@ -100,9 +103,9 @@ public class XConnectionHelp implements Serializable {
         return RET_SUCC;
     }
 
-    public String login2Server(String usr, String pwd, String ip) {
+    public String login2Server(User user) {
         try {
-            String ret = connect2Server(usr, pwd, ip);
+            String ret = connect2Server(user);
             if (!(RET_SUCC.equals(ret))) {
                 return ret;
             } else {

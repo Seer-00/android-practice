@@ -4,37 +4,100 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegLogActivity"
-    android:orientation="vertical">
+    tools:mainActivity=".RegLogActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/icon"/>
 
     <EditText
         android:id="@+id/edit_usr"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="50dp"
-        android:hint="Username"/>
+        android:layout_marginBottom="6dp"
+        android:hint="用户名"
+        android:background="@drawable/default_edittext"
+        style="@style/DefaultEditText"/>
 
     <EditText
         android:id="@+id/edit_pwd"
-        android:layout_width="match_parent"
+        android:inputType="textPassword"
+        android:layout_width="300dp"
         android:layout_height="50dp"
-        android:hint="Password"/>
+        android:layout_marginBottom="6dp"
+        android:hint="密码"
+        android:background="@drawable/default_edittext"
+        style="@style/DefaultEditText"/>
+
+    <EditText
+        android:id="@+id/edit_domain"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="6dp"
+        android:hint="服务器名"
+        android:background="@drawable/default_edittext"
+        style="@style/DefaultEditText"/>
 
     <EditText
         android:id="@+id/edit_ip"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="50dp"
-        android:hint="Server IP Address"/>
+        android:layout_marginBottom="6dp"
+        android:hint="服务器IP地址"
+        android:background="@drawable/default_edittext"
+        style="@style/DefaultEditText"/>
 
-    <Button
-        android:id="@+id/btn_login"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Login"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/btn_register"
+        <CheckBox
+            android:id="@+id/ckb_remember"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="记住信息"
+            style="@style/DefaultTextSize" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Register"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_register"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_marginEnd="36dp"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            android:text="注册"
+            android:background="@drawable/default_button" />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            android:text="登录"
+            android:background="@drawable/default_button" />
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

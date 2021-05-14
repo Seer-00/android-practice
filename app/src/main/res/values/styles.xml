@@ -9,12 +9,26 @@
     </style>
 
     <style name="BookInfoContent">
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="BookInfoTitle">
-        <item name="android:textSize">20dp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DefaultTextSize">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="ChatTextSize">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="DefaultEditText">
+        <item name="android:textSize">18sp</item>
+        <item name="android:padding">10sp</item>
+        <item name="android:singleLine">true</item>
     </style>
 
 </resources>
