@@ -24,8 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="25dp"
-        android:text="请对准ISBN码开始扫描"
-        android:textSize="16dp"
+        android:text="请在边框内进行扫描"
+        android:textSize="16sp"
         android:textColor="#fff" />
 
 </merge>

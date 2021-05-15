@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:showDividers = "end"
-    android:layout_marginTop="7dp"
-    android:layout_marginBottom="7dp">
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/contact_image"
         android:layout_width="66dp"
         android:layout_height="66dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="14dp"
         fresco:roundedCornerRadius="12dp"
         fresco:actualImageScaleType="centerCrop"/>
 
@@ -21,8 +21,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:textSize="20dp"
-        android:layout_marginLeft="20dp"
-        android:textColor="#000000"/>
+        android:textSize="20sp"
+        android:layout_marginStart="26dp"
+        android:textColor="#000"/>
 
 </LinearLayout>

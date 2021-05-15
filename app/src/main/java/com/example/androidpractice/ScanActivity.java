@@ -1,4 +1,4 @@
-package com.example.androidpractice.isbn;
+package com.example.androidpractice;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import com.example.androidpractice.R;
 import com.journeyapps.barcodescanner.CaptureManager;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
-public class ScanISBNActivity extends Activity implements DecoratedBarcodeView.TorchListener {
+public class ScanActivity extends Activity implements DecoratedBarcodeView.TorchListener {
 
     private DecoratedBarcodeView decoratedBarcodeView;
     private CaptureManager captureManager;

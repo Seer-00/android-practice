@@ -5,12 +5,19 @@ import android.util.Log;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
+import org.jivesoftware.smackx.search.ReportedData;
+import org.jivesoftware.smackx.search.UserSearchManager;
+import org.jivesoftware.smackx.xdata.Form;
+import org.jxmpp.jid.DomainBareJid;
+import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.jid.parts.Localpart;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -127,5 +134,42 @@ public class XConnectionHelp implements Serializable {
             return RET_FAIL;
         }
         return RET_SUCC;
+    }
+
+    public boolean isUserExistInServer(String username) {
+        try {
+            DomainBareJid jid =
+                    JidCreate.domainBareFrom("search." + connection.getXMPPServiceDomain());
+            UserSearchManager search = new UserSearchManager(connection);
+            Form searchForm = search.getSearchForm(jid);
+            Form answerForm = searchForm.createAnswerForm();
+            // 根据用户名查找
+            answerForm.setAnswer("Username", true);
+            answerForm.setAnswer("search", username);
+
+            ReportedData data = search.getSearchResults(answerForm, jid);
+            Log.i(TAG, data.getRows().size() + "");
+
+            if (data.getRows() != null) {
+                for (ReportedData.Row row : data.getRows()) {
+                    for (CharSequence value : row.getValues("jid")) {
+                        Log.i(TAG, " " + value);
+                    }
+                }
+            } else {
+                return false;
+            }
+            // 若服务器返回的数据行数 > 0 (通常是1)，说明服务器上存在该用户，否则不存在
+            return (data.getRows().size() > 0);
+
+        } catch (InterruptedException
+                | XMPPException.XMPPErrorException
+                | XmppStringprepException
+                | SmackException.NotConnectedException
+                | SmackException.NoResponseException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

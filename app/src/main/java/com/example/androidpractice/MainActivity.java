@@ -21,23 +21,25 @@ import com.example.androidpractice.isbn.BookInfo;
 import com.example.androidpractice.isbn.BookInfoDetailActivity;
 import com.example.androidpractice.isbn.DownloadUtils;
 import com.example.androidpractice.isbn.Response;
-import com.example.androidpractice.isbn.ScanISBNActivity;
-import com.example.androidpractice.ui.others.OthersFragment;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
+import org.jxmpp.jid.BareJid;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.util.Collection;
 
@@ -47,13 +49,20 @@ import static org.jivesoftware.smack.roster.Roster.SubscriptionMode.accept_all;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getName();
 
+    public static final int SCAN_TYPE_ISBN = 1000;
+    public static final int SCAN_TYPE_QRCODE = 1001;
+
+    public static final int ROSTER_MSG_UPD = 0;
+    public static final int ROSTER_MSG_ADD = 1;
+    public static final int ROSTER_MSG_DEL = 2;
+
     private static User user;
 
     private ProgressDialog progressDialog;
-    private static IntentIntegrator intentIntegrator;
     private static DownloadHandler downloadHandler;
     private static ConnHandler connHandler;
     private static RecvHandler recvHandler;
+    private static RosterHandler rosterHandler;
     private static XConnectionHelp conn;
     private static ChatManager chatManager;
     private static Roster roster;
@@ -82,9 +91,15 @@ public class MainActivity extends AppCompatActivity {
         Fresco.initialize(this);
         // initialize layout (in ConnHandler) after connect to server successfully
         initConnection();
+
+        // Handle status of connection to server
+        connHandler = new ConnHandler(this);
+        // Handle messages from other contacts
+        recvHandler = new RecvHandler(this);
+        // Handle messages from roster
+        rosterHandler = new RosterHandler(this);
         // Handle thread of downloading book info
         downloadHandler = new DownloadHandler(this);
-        intentIntegrator = new IntentIntegrator(this);
     }
 
     @Override
@@ -150,6 +165,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private static class RosterHandler extends Handler {
+        private MainActivity mainActivity;
+
+        public RosterHandler(MainActivity mainActivity) {
+            this.mainActivity = mainActivity;
+        }
+
+        @Override
+        public void handleMessage(@NonNull android.os.Message msg) {
+            if (msg.obj == null) {
+                return;
+            }
+            String s = (String) msg.obj;
+
+            switch (msg.what) {
+                case ROSTER_MSG_UPD: {
+                    //Toast.makeText(mainActivity, "好友列表已更新", Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case ROSTER_MSG_ADD: {
+                    Toast.makeText(mainActivity, s + "已添加您为好友", Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case ROSTER_MSG_DEL: {
+                    Toast.makeText(mainActivity, s + "已从好友列表删除", Toast.LENGTH_LONG).show();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+
     /* initialize */
     private void initLayout() {
         setContentView(R.layout.activity_main);
@@ -169,8 +217,6 @@ public class MainActivity extends AppCompatActivity {
         user = intent.getParcelableExtra("User");
 
         conn = new XConnectionHelp();
-        connHandler = new ConnHandler(this);
-        recvHandler = new RecvHandler(this);
 
         showProgressDialog();
 
@@ -208,29 +254,37 @@ public class MainActivity extends AppCompatActivity {
 
         roster.addRosterListener(new RosterListener() {
             public void entriesAdded(Collection<Jid> addresses) {
-                Log.i(TAG, "Add");
-                for(Jid jid : addresses) {
-                    Log.i(TAG, jid.toString());
+                for (Jid jid : addresses) {
+                    android.os.Message msg = android.os.Message.obtain();
+                    msg.what = ROSTER_MSG_ADD;
+                    msg.obj = jid.toString();
+                    rosterHandler.sendMessage(msg);
                 }
             }
+
             public void entriesDeleted(Collection<Jid> addresses) {
-                Log.i(TAG, "Del");
-                for(Jid jid : addresses) {
-                    Log.i(TAG, jid.toString());
+                for (Jid jid : addresses) {
+                    android.os.Message msg = android.os.Message.obtain();
+                    msg.what = ROSTER_MSG_DEL;
+                    msg.obj = jid.toString();
+                    rosterHandler.sendMessage(msg);
                 }
             }
+
             public void entriesUpdated(Collection<Jid> addresses) {
-                Log.i(TAG, "Updated");
-                for(Jid jid : addresses) {
-                    Log.i(TAG, jid.toString());
+                for (Jid jid : addresses) {
+                    android.os.Message msg = android.os.Message.obtain();
+                    msg.what = ROSTER_MSG_UPD;
+                    msg.obj = jid.toString();
+                    rosterHandler.sendMessage(msg);
                 }
             }
+
             public void presenceChanged(Presence presence) {
-                Log.i(TAG, "Presence changed: " + presence.getFrom() + " " + presence);
             }
         });
 
-        Collection<RosterEntry> entries = roster.getEntries();
+        /*Collection<RosterEntry> entries = roster.getEntries();
         for (RosterEntry entry : entries) {
             Log.i(TAG, "JID: " + entry.getJid() + " Group: " + entry.getGroups()
                     + " Type: " + entry.getType() + " Name: " + entry.getName());
@@ -239,12 +293,12 @@ public class MainActivity extends AppCompatActivity {
         // JID: test1@ubuntu
         // Group: [org.jivesoftware.smack.roster.RosterGroup@2d68d6d3]
         // Type: both
-        // Name: test1
+        // Name: test1*/
         Log.i(TAG, "init Roster");
     }
 
     /* For scanning ISBN */
-    public void startScanner() {
+    public void startScanner(int requestCode) {
         // 原始扫描
         /*
         IntentIntegrator integrator = new IntentIntegrator(mainActivity.this);
@@ -252,43 +306,19 @@ public class MainActivity extends AppCompatActivity {
         */
 
         // 自定义样式扫描
-        // new IntentIntegrator(this)
-        intentIntegrator
+        new IntentIntegrator(this)
                 // 扫码的类型
                 .setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
                 // 选择摄像头，可使用前置或者后置
                 .setCameraId(0)
                 // 是否开启声音，扫完码之后会"哔"的一声
                 .setBeepEnabled(true)
-                //自定义扫码界面
-                .setCaptureActivity(ScanISBNActivity.class)
+                // 自定义扫码界面
+                .setCaptureActivity(ScanActivity.class)
+                // 设置MainActivity的回调码
+                .setRequestCode(requestCode)
                 // 初始化扫码
                 .initiateScan();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode) {
-            case IntentIntegrator.REQUEST_CODE: {
-                IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-                if ((result == null) || (result.getContents() == null)) {
-                    Toast.makeText(this, "扫描取消", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                /* ISBN for debugging */
-                // String contents = "0000000000000";      // book not found
-                // String contents = "9787121402180";      // no cover
-                // String contents = "9787115209306";      // valid
-
-                String contents = result.getContents();
-                Toast.makeText(this, "扫描结果: " + contents, Toast.LENGTH_LONG).show();
-                startDownloadBookInfo(contents);
-                break;
-            }
-            default:
-                break;
-        }
     }
 
     private class DownloadThread extends Thread {
@@ -349,6 +379,7 @@ public class MainActivity extends AppCompatActivity {
                 mainActivity.startActivity(intent);
             }
         }
+
     }
 
     public void startDownloadBookInfo(String isbn) {
@@ -367,5 +398,53 @@ public class MainActivity extends AppCompatActivity {
 
         DownloadThread thread = new DownloadThread(BookAPI.URL_ISBN_BASE + isbn);
         thread.start();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(resultCode, data);
+        if (result.getContents() == null) {
+            Toast.makeText(this, "扫描取消", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        switch (requestCode) {
+            case SCAN_TYPE_ISBN: {
+                /* ISBN for debugging */
+                // String contents = "0000000000000";      // book not found
+                // String contents = "9787121402180";      // no cover
+                // String contents = "9787115209306";      // valid
+
+                String contents = result.getContents();
+                startDownloadBookInfo(contents);
+                break;
+            }
+            case SCAN_TYPE_QRCODE: {
+                String peerName = result.getContents();
+                if (peerName.isEmpty()) {
+                    Toast.makeText(this, "用户不存在", Toast.LENGTH_SHORT).show();
+                }
+                BareJid peerJID;
+                try {
+                    if (!conn.isUserExistInServer(peerName)) {
+                        Toast.makeText(this, "用户不存在", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    peerJID = JidCreate.bareFrom(peerName + "@" + user.getDom());
+                    roster.createEntry(peerJID, peerName, null);
+                    Toast.makeText(this, "好友请求已发送", Toast.LENGTH_SHORT).show();
+                } catch (XmppStringprepException
+                        | InterruptedException
+                        | SmackException.NotLoggedInException
+                        | XMPPException.XMPPErrorException
+                        | SmackException.NotConnectedException
+                        | SmackException.NoResponseException e) {
+                    Toast.makeText(this, "添加好友出现错误", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+                break;
+            }
+            default:
+                break;
+        }
     }
 }

@@ -18,12 +18,16 @@ import com.example.androidpractice.MainActivity;
 import com.example.androidpractice.R;
 import com.example.androidpractice.XConnectionHelp;
 
+import org.jivesoftware.smack.SmackException.NotLoggedInException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ContactFragment extends Fragment {
@@ -33,7 +37,7 @@ public class ContactFragment extends Fragment {
     private static XConnectionHelp conn;
     private static ChatManager chatManager;
     private static Roster roster;
-    private List<Contact> contactList;
+    private static List<Contact> contactList;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -60,9 +64,19 @@ public class ContactFragment extends Fragment {
             Log.i(TAG, "conn|chatManger|roster is null");
             return;
         }
-        // 获取最新的好友信息
-        contactList = new ArrayList<>();
 
+        if (contactList == null) {
+            contactList = new LinkedList<>();
+        } else {
+            contactList.clear();
+        }
+        // 获取最新的好友信息
+        try {
+            roster.reload(); // 异步刷新，所以可能需要多次才会更新UI
+        } catch (NotLoggedInException | NotConnectedException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        // 插入好友信息
         Collection<RosterEntry> entries = roster.getEntries();
         for (RosterEntry entry : entries) {
             Log.i(TAG, "JID: " + entry.getJid() + " Group: " + entry.getGroups()
@@ -70,6 +84,13 @@ public class ContactFragment extends Fragment {
 
             contactList.add(new Contact(entry.getJid().toString()));
         }
+        // 排序显示，符合习惯
+        Collections.sort(contactList, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact o1, Contact o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
     }
 
     private void getConnObjFromActivity() {

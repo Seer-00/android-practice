@@ -9,8 +9,8 @@
         android:id="@+id/decoratedBarcodeView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:zxing_framing_rect_height="200dp"
-        app:zxing_framing_rect_width="260dp"
+        app:zxing_framing_rect_height="280dp"
+        app:zxing_framing_rect_width="280dp"
         app:zxing_preview_scaling_strategy="fitXY"
         app:zxing_scanner_layout="@layout/layout_zxing"
         app:zxing_use_texture_view="true" />
