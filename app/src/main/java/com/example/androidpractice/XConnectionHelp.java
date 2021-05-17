@@ -30,7 +30,7 @@ public class XConnectionHelp implements Serializable {
     private static final String TAG = XConnectionHelp.class.getName();
 
     private static final int PORT = 5222;
-    //    public static final String DOMAIN = "ubuntu";
+    private static String DOMAIN = "ubuntu";
 //    public static final String IP = "192.168.43.136";
     public static final String IP = "172.21.42.126";
     public static final String RET_SUCC = "操作成功";
@@ -63,6 +63,8 @@ public class XConnectionHelp implements Serializable {
             connection = new XMPPTCPConnection(configBuilder.build());
             // 连接到服务器
             connection.connect();
+
+            DOMAIN = u.getDom();
 
         } catch (XMPPException.XMPPErrorException e) {
             e.printStackTrace();
@@ -153,6 +155,10 @@ public class XConnectionHelp implements Serializable {
             if (data.getRows() != null) {
                 for (ReportedData.Row row : data.getRows()) {
                     for (CharSequence value : row.getValues("jid")) {
+                        if (!(value.equals(username + "@" + DOMAIN))) {
+                            // 排除 a 匹配到 abc 的情况
+                            return false;
+                        }
                         Log.i(TAG, " " + value);
                     }
                 }
