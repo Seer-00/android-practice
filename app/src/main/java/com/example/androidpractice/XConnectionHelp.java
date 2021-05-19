@@ -155,18 +155,30 @@ public class XConnectionHelp implements Serializable {
             if (data.getRows() != null) {
                 for (ReportedData.Row row : data.getRows()) {
                     for (CharSequence value : row.getValues("jid")) {
-                        if (!(value.equals(username + "@" + DOMAIN))) {
-                            // 排除 a 匹配到 abc 的情况
-                            return false;
-                        }
+                        /*
+                        *   举例：若a，ab，abc均存在：
+                        *   输入a，返回a，ab，abc
+                        *   输入ab，返回ab，abc
+                        *   输入abc，返回abc
+                        * **************************
+                        *   而若仅有abc存在：
+                        *   输入a，返回abc
+                        *   输入ab，返回abc
+                        *   输入abc，返回abc
+                        * **************************
+                        *   所以，若输入为xxx且xxx存在，则xxx必然在第一行
+                        *   因此，只需判断第一行是否匹配，即第一次循环就会执行return
+                        */
                         Log.i(TAG, " " + value);
+                        return value.equals(username + "@" + DOMAIN);
                     }
                 }
             } else {
                 return false;
             }
             // 若服务器返回的数据行数 > 0 (通常是1)，说明服务器上存在该用户，否则不存在
-            return (data.getRows().size() > 0);
+            // 如for循环中的分析，依据size判断是不准确的，不可采用
+            // return (data.getRows().size() > 0);
 
         } catch (InterruptedException
                 | XMPPException.XMPPErrorException
