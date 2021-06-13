@@ -2,6 +2,7 @@ package com.example.androidpractice;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +30,6 @@ import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class ChatActivity extends Activity {
@@ -57,21 +57,30 @@ public class ChatActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        initMsgList();
         initConnection();
     }
 
     @Override
     protected void onDestroy() {
+        // 将消息记录保存到文件中
+        Msg.saveMsgToFile(this, peerJID, msgList);
+        // 关闭连接
         conn.getConnection().disconnect();
         super.onDestroy();
     }
 
-    private void initConnection() {
+    private void initMsgList() {
+        // 从Intent中获得自己的用户名和对方的用户名
         Intent intent = getIntent();
         self = intent.getParcelableExtra("Self");
         peerJID = intent.getStringExtra("PeerJID");
         peer = Contact.getNameFromJID(peerJID);
+        // 从文件中读取消息记录
+        msgList = Msg.loadMsgfromFile(this, peerJID);
+    }
 
+    private void initConnection() {
         conn = new XConnectionHelp();
         connHandler = new ConnHandler(this);
         recvHandler = new RecvHandler(this);
@@ -89,7 +98,6 @@ public class ChatActivity extends Activity {
     }
 
     private void initLayout() {
-        msgList = new LinkedList<>();
         edt_msg = findViewById(R.id.edit_msg);
         btn_send = findViewById(R.id.btn_msg_send);
         recyclerView = findViewById(R.id.chat_recycler_view);
@@ -178,15 +186,26 @@ public class ChatActivity extends Activity {
             }
 
             Message recvMsg = (Message) msg.obj;
+            // example: abc@ubuntu/9qdohi7qui
+            String from = recvMsg.getFrom().toString();
+            // example: abc@ubuntu
+            String fromJID = from.substring(0, from.indexOf('/'));
+            // example: abc
+            String fromName = from.substring(0, from.indexOf('@'));
 
-            String from = Contact.getNameFromJID(recvMsg.getFrom().toString());
-
-            if (peer.equals(from)) { // 当前对话的人发来的消息
+            if (peer.equals(fromName)) { // 当前对话的人发来的消息
                 chatActivity.msgList.add(new Msg(Msg.TYPE_RECV, recvMsg.getBody()));
                 chatActivity.adapter.notifyItemInserted(chatActivity.msgList.size() - 1);
                 chatActivity.recyclerView.scrollToPosition(chatActivity.msgList.size() - 1);
-            } else { // 其他人发来的消息，此处简化处理
-                Toast.makeText(chatActivity,  "[新消息] " + from + ": " + recvMsg.getBody(),
+            } else { // 其他人发来的消息，将其保存到消息历史记录文件
+                // 读取更新前的消息记录列表
+                List<Msg> msgList = Msg.loadMsgfromFile(chatActivity, fromJID);
+                // 向List添加该条记录
+                msgList.add(new Msg(Msg.TYPE_RECV, recvMsg.getBody()));
+                // 将更新后的消息记录列表保存
+                Msg.saveMsgToFile(chatActivity, fromJID, msgList);
+
+                Toast.makeText(chatActivity, "[新消息] " + fromName + ": " + recvMsg.getBody(),
                         Toast.LENGTH_LONG).show();
             }
         }

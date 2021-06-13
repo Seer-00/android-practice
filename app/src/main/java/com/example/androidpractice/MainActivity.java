@@ -15,12 +15,12 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.androidpractice.contacts.Contact;
 import com.example.androidpractice.isbn.BookAPI;
 import com.example.androidpractice.isbn.BookInfo;
 import com.example.androidpractice.isbn.BookInfoDetailActivity;
 import com.example.androidpractice.isbn.DownloadUtils;
 import com.example.androidpractice.isbn.Response;
+import com.example.androidpractice.msg.Msg;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -42,6 +42,7 @@ import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.jivesoftware.smack.roster.Roster.SubscriptionMode.accept_all;
 
@@ -158,9 +159,21 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Message recvMsg = (Message) msg.obj;
-            String from = Contact.getNameFromJID(recvMsg.getFrom().toString());
+            // example: abc@ubuntu/9qdohi7qui
+            String from = recvMsg.getFrom().toString();
+            // example: abc@ubuntu
+            String fromJID = from.substring(0, from.indexOf('/'));
+            // example: abc
+            String fromName = from.substring(0, from.indexOf('@'));
 
-            Toast.makeText(mainActivity, "[新消息] " + from + ": " + recvMsg.getBody(),
+            // 读取更新前的消息记录列表
+            List<Msg> msgList = Msg.loadMsgfromFile(mainActivity, fromJID);
+            // 向List添加该条记录
+            msgList.add(new Msg(Msg.TYPE_RECV, recvMsg.getBody()));
+            // 将更新后的消息记录列表保存
+            Msg.saveMsgToFile(mainActivity, fromJID, msgList);
+
+            Toast.makeText(mainActivity, "[新消息] " + fromName + ": " + recvMsg.getBody(),
                     Toast.LENGTH_LONG).show();
         }
     }
