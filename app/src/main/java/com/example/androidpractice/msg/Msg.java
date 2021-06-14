@@ -32,13 +32,13 @@ public class Msg implements Serializable {
         return content;
     }
 
-    public static void saveMsgToFile(Context context, String peerJID, List<Msg> msgList) {
+    public static void saveMsgToFile(Context context, String username, String peerJID, List<Msg> msgList) {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
         ContextWrapper contextWrapper = new ContextWrapper(context);
         try {
-            // 文件名：peerJID，方式：覆写
-            fos = contextWrapper.openFileOutput(peerJID, Context.MODE_PRIVATE);
+            // 文件名：username + @ + peerJID，方式：覆写
+            fos = contextWrapper.openFileOutput(username + "@" + peerJID, Context.MODE_PRIVATE);
             oos = new ObjectOutputStream(fos);
             oos.writeObject(msgList);
 
@@ -55,15 +55,15 @@ public class Msg implements Serializable {
         }
     }
 
-    public static List<Msg> loadMsgfromFile(Context context, String peerJID) {
+    public static List<Msg> loadMsgfromFile(Context context, String username, String peerJID) {
         List<Msg> msgList = null;
         // 从文件中加载消息记录
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         ContextWrapper contextWrapper = new ContextWrapper(context);
         try {
-            // 文件名即peerJID
-            fis = contextWrapper.openFileInput(peerJID);
+            // 文件名：username + @ + peerJID
+            fis = contextWrapper.openFileInput(username + "@" + peerJID);
             ois = new ObjectInputStream(fis);
             msgList = (List<Msg>) ois.readObject();
 //            for (Msg msg : msgList) {

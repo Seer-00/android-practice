@@ -2,7 +2,6 @@ package com.example.androidpractice;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -64,7 +63,7 @@ public class ChatActivity extends Activity {
     @Override
     protected void onDestroy() {
         // 将消息记录保存到文件中
-        Msg.saveMsgToFile(this, peerJID, msgList);
+        Msg.saveMsgToFile(this, self.getName(), peerJID, msgList);
         // 关闭连接
         conn.getConnection().disconnect();
         super.onDestroy();
@@ -77,7 +76,7 @@ public class ChatActivity extends Activity {
         peerJID = intent.getStringExtra("PeerJID");
         peer = Contact.getNameFromJID(peerJID);
         // 从文件中读取消息记录
-        msgList = Msg.loadMsgfromFile(this, peerJID);
+        msgList = Msg.loadMsgfromFile(this, self.getName(), peerJID);
     }
 
     private void initConnection() {
@@ -130,7 +129,9 @@ public class ChatActivity extends Activity {
                         // 清空编辑框
                         edt_msg.setText("");
 
-                    } catch (XmppStringprepException | SmackException.NotConnectedException | InterruptedException e) {
+                    } catch (XmppStringprepException
+                            | SmackException.NotConnectedException
+                            | InterruptedException e) {
                         e.printStackTrace();
                         Log.i(TAG, e.getMessage());
                         Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -201,11 +202,11 @@ public class ChatActivity extends Activity {
                 chatActivity.recyclerView.scrollToPosition(chatActivity.msgList.size() - 1);
             } else { // 其他人发来的消息，将其保存到消息历史记录文件
                 // 读取更新前的消息记录列表
-                List<Msg> msgList = Msg.loadMsgfromFile(chatActivity, fromJID);
+                List<Msg> msgList = Msg.loadMsgfromFile(chatActivity, self.getName(), fromJID);
                 // 向List添加该条记录
                 msgList.add(new Msg(Msg.TYPE_RECV, recvMsg.getBody()));
                 // 将更新后的消息记录列表保存
-                Msg.saveMsgToFile(chatActivity, fromJID, msgList);
+                Msg.saveMsgToFile(chatActivity, self.getName(), fromJID, msgList);
 
                 Toast.makeText(chatActivity, "[新消息] " + fromName + ": " + recvMsg.getBody(),
                         Toast.LENGTH_LONG).show();

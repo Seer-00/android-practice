@@ -167,11 +167,11 @@ public class MainActivity extends AppCompatActivity {
             String fromName = from.substring(0, from.indexOf('@'));
 
             // 读取更新前的消息记录列表
-            List<Msg> msgList = Msg.loadMsgfromFile(mainActivity, fromJID);
+            List<Msg> msgList = Msg.loadMsgfromFile(mainActivity, user.getName(), fromJID);
             // 向List添加该条记录
             msgList.add(new Msg(Msg.TYPE_RECV, recvMsg.getBody()));
             // 将更新后的消息记录列表保存
-            Msg.saveMsgToFile(mainActivity, fromJID, msgList);
+            Msg.saveMsgToFile(mainActivity, user.getName(), fromJID, msgList);
 
             Toast.makeText(mainActivity, "[新消息] " + fromName + ": " + recvMsg.getBody(),
                     Toast.LENGTH_LONG).show();
