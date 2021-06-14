@@ -29,10 +29,15 @@ public class XConnectionHelp implements Serializable {
 
     private static final String TAG = XConnectionHelp.class.getName();
 
-    private static final int PORT = 5222;
-    private static String DOMAIN = "ubuntu";
+    private static final int PORT = 49371;  // 外网端口
+//    private static final int PORT = 5222; // 内网端口 / openfire服务端口
+
+    public static final String IP = "103.46.128.53";   // 外网ip
 //    public static final String IP = "192.168.43.136";
-    public static final String IP = "172.21.42.126";
+//    public static final String IP = "172.21.42.126";
+
+    public static final String DOMAIN = "ubuntu";
+
     public static final String RET_SUCC = "操作成功";
     public static final String RET_FAIL = "操作失败";
 
@@ -53,7 +58,7 @@ public class XConnectionHelp implements Serializable {
                     //设置主机位置，也就是服务器ip
                     .setHostAddress(InetAddress.getByName(u.getIp()))
                     //等同于上面那句话builder.setHost("xxx.xxx.xxx.xxx");
-                    //设置端口号，默认5222
+                    //设置端口号
                     .setPort(PORT)
                     //设置不验证，否则需要TLS验证
                     .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
@@ -63,8 +68,6 @@ public class XConnectionHelp implements Serializable {
             connection = new XMPPTCPConnection(configBuilder.build());
             // 连接到服务器
             connection.connect();
-
-            DOMAIN = u.getDom();
 
         } catch (XMPPException.XMPPErrorException e) {
             e.printStackTrace();
@@ -166,8 +169,8 @@ public class XConnectionHelp implements Serializable {
                         *   输入ab，返回abc
                         *   输入abc，返回abc
                         * **************************
-                        *   所以，若输入为xxx且xxx存在，则xxx必然在第一行
-                        *   因此，只需判断第一行是否匹配，即第一次循环就会执行return
+                        *   所以，若输入为xxx且xxx存在，则xxx必然在第1行
+                        *   因此，只需判断第1行是否匹配，即第1次循环就会执行return
                         */
                         Log.i(TAG, " " + value);
                         return value.equals(username + "@" + DOMAIN);
@@ -176,9 +179,6 @@ public class XConnectionHelp implements Serializable {
             } else {
                 return false;
             }
-            // 若服务器返回的数据行数 > 0 (通常是1)，说明服务器上存在该用户，否则不存在
-            // 如for循环中的分析，依据size判断是不准确的，不可采用
-            // return (data.getRows().size() > 0);
 
         } catch (InterruptedException
                 | XMPPException.XMPPErrorException

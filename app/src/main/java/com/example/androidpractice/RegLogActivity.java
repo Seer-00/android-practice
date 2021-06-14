@@ -2,6 +2,7 @@ package com.example.androidpractice;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -50,13 +51,13 @@ public class RegLogActivity extends Activity {
 
         AndroidSmackInitializer.initialize(this);
 
-        initViews();
+        initViews(this);
 
         conn = new XConnectionHelp();
         connHandler = new ConnHandler(this);
     }
 
-    private void initViews() {
+    private void initViews(final Context context) {
         edtUsr = findViewById(R.id.edit_usr);
         edtPwd = findViewById(R.id.edit_pwd);
         edtDom = findViewById(R.id.edit_domain);
@@ -73,6 +74,7 @@ public class RegLogActivity extends Activity {
                 user = getInput();
 
                 if (user == null) {
+                    Toast.makeText(context, "用户名不可含有@", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -89,6 +91,7 @@ public class RegLogActivity extends Activity {
                 user = getInput();
 
                 if (user == null) {
+                    Toast.makeText(context, "用户名不可含有@", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -162,7 +165,6 @@ public class RegLogActivity extends Activity {
                         regLogActivity.storeInfo();
                         regLogActivity.startMainActivity();
                         regLogActivity.finish();
-
                     }
                     break;
                 }
@@ -208,12 +210,16 @@ public class RegLogActivity extends Activity {
     private void loadInfo() {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean remember = pref.getBoolean("remember_info", false);
+        // 若勾选了"记住信息"，从SharedPreferences获得信息
         if (remember) {
             edtUsr.setText(pref.getString("username", ""));
             edtPwd.setText(pref.getString("password", ""));
             edtDom.setText(pref.getString("domain", ""));
             edtIP.setText(pref.getString("ip_address", ""));
             checkBox.setChecked(true);
+        } else { // 默认Domain和IP
+            edtDom.setText(XConnectionHelp.DOMAIN);
+            edtIP.setText(XConnectionHelp.IP);
         }
     }
 
