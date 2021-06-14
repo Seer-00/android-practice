@@ -32,7 +32,7 @@ public class DownloadUtils {
                 res.setResMessage(parseBookInfo(json));
                 // 数据无效（如书本未找到），ResCode == 404
                 if (res.getResMessage() == null) {
-                    res.setResCode(BookAPI.RESPONSE_CODE_ERROE_BOOK_NOT_FOUND);
+                    res.setResCode(BookAPI.RESPONSE_CODE_ERROR_BOOK_NOT_FOUND);
                     res.setResMessage("没有找到这本书...");
                 }
                 break;

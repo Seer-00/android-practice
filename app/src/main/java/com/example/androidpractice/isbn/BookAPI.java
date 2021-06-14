@@ -4,7 +4,7 @@ public class BookAPI {
 
     public static final int RESPONSE_CODE_SUCCEED = 200;
     public static final int RESPONSE_CODE_ERROR_TIME_OUT = 408;
-    public static final int RESPONSE_CODE_ERROE_BOOK_NOT_FOUND = 404;
+    public static final int RESPONSE_CODE_ERROR_BOOK_NOT_FOUND = 404;
 
     // public static String URL_ISBN_BASE = "https://api.zuk.pw/situ/book/isbn/";
     public static String URL_ISBN_BASE = "https://book.zuk.pw/?s=Index.V1_Open.Book&isbn=";
