@@ -109,6 +109,8 @@ public class ChatActivity extends Activity {
         recyclerView.setLayoutManager(manager);
         adapter = new MsgAdapter(msgList, this, peer, self.getName());
         recyclerView.setAdapter(adapter);
+        // 移动到最后一行
+        recyclerView.scrollToPosition(msgList.size() - 1);
 
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
